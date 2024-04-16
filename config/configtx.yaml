@@ -1,0 +1,218 @@
+# Sets up the 3 orgs in the network
+
+# CAPABILITIES
+Capabilities:
+  Application: &ApplicationCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Channel: &ChannelCapabilities
+    V2_0: true
+
+# ORGANIZATIONS
+Organizations:
+  - &Orderer
+    Name: Orderer
+    ID: OrdererMSP
+    MSPDir: ./crypto-config/ordererOrganizations/intellectualproperty.com/msp 
+    Policies: &OrdererPolicies
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        # ONLY Admin Role can carry out administration activities
+        Rule: "OR('OrdererMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+
+  - &PrivateIntellectual
+    Name: PrivateIntellectual
+    ID: PrivateintellectualMSP
+    MSPDir: ./crypto-config/peerOrganizations/privateintellectual.com/msp
+    Policies: &PrivateIntellectualPolicies
+      Readers:
+        Type: Signature
+        # Any member
+        Rule: "OR('PrivateintellectualMSP.member')"
+      Writers:
+        Type: Signature
+        # Any member
+        Rule: "OR('PrivateintellectualMSP.member')"
+      Admins:
+        Type: Signature
+        # BOTH Privateuni Admin AND Orderer Admin needed for admin activities
+        Rule: "OR('PrivateintellectualMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('PrivateintellectualMSP.member')"
+    AnchorPeers:
+      - Host: regulatoryauthorities.privateintellectual.com
+        Port: 7051
+
+  - &InterIntellectual
+    Name: InterIntellectual
+    ID: InterintellectualMSP
+    MSPDir: ./crypto-config/peerOrganizations/interintellectual.com/msp
+    Policies: &InterIntellectualPolicies
+      Readers:
+        Type: Signature
+        # Any member
+        Rule: "OR('InterintellectualMSP.member')"
+      Writers:
+        Type: Signature
+        # Any member
+        Rule: "OR('InterintellectualMSP.member')"
+      Admins:
+        Type: Signature
+        # BOTH Interuni Admin AND Orderer Admin needed for admin activities
+        Rule: "OR('InterintellectualMSP.member')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('InterintellectualMSP.member')"
+    AnchorPeers:
+      - Host: creators.interintellectual.com
+        Port: 7051
+      - Host: publishers.interintellectual.com
+        Port: 7051
+
+# ORDERER
+Orderer: &OrdererDefaults
+  OrdererType: solo
+  Addresses:
+    # UPDATE THE IP ADDRESS
+    - orderer.intellectualproperty.com:7050
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 98 MB
+    PreferredMaxBytes: 512 KB
+  Capabilities:
+    <<: *OrdererCapabilities
+
+# APPLICATION
+Application: &ApplicationDefaults
+  ACLs: &ACLsDefault
+    # ACL policy for lscc's "getid" function
+    lscc/ChaincodeExists: /Channel/Application/Readers
+    # ACL policy for lscc's "getdepspec" function
+    lscc/GetDeploymentSpec: /Channel/Application/Readers
+    # ACL policy for lscc's "getccdata" function
+    lscc/GetChaincodeData: /Channel/Application/Readers
+    # ACL Policy for lscc's "getchaincodes" function
+    lscc/GetInstantiatedChaincodes: /Channel/Application/Readers
+    # ACL policy for qscc's "GetChainInfo" function
+    qscc/GetChainInfo: /Channel/Application/Readers
+    # ACL policy for qscc's "GetBlockByNumber" function
+    qscc/GetBlockByNumber: /Channel/Application/Readers
+    # ACL policy for qscc's "GetBlockByHash" function
+    qscc/GetBlockByHash: /Channel/Application/Readers
+    # ACL policy for qscc's "GetTransactionByID" function
+    qscc/GetTransactionByID: /Channel/Application/Readers
+    # ACL policy for qscc's "GetBlockByTxID" function
+    qscc/GetBlockByTxID: /Channel/Application/Readers
+    # ACL policy for cscc's "GetConfigBlock" function
+    cscc/GetConfigBlock: /Channel/Application/Readers
+    # ACL policy for cscc's "GetConfigTree" function
+    cscc/GetConfigTree: /Channel/Application/Readers
+    # ACL policy for cscc's "SimulateConfigTreeUpdate" function
+    cscc/SimulateConfigTreeUpdate: /Channel/Application/Readers
+    # ACL policy for invoking chaincodes on peer
+    peer/Propose: /Channel/Application/Writers
+    # ACL policy for chaincode to chaincode invocation
+    peer/ChaincodeToChaincode: /Channel/Application/Readers
+    # ACL policy for sending block events
+    event/Block: /Channel/Application/Readers
+    # ACL policy for sending filtered block events
+    event/FilteredBlock: /Channel/Application/Readers
+    # Chaincode Lifecycle Policies introduced in Fabric 2.x
+    # ACL policy for _lifecycle's "CheckCommitReadiness" function
+    _lifecycle/CheckCommitReadiness: /Channel/Application/Writers
+    # ACL policy for _lifecycle's "CommitChaincodeDefinition" function
+    _lifecycle/CommitChaincodeDefinition: /Channel/Application/Writers
+    # ACL policy for _lifecycle's "QueryChaincodeDefinition" function
+    _lifecycle/QueryChaincodeDefinition: /Channel/Application/Readers
+
+
+  # Default policies
+  Policies: &ApplicationDefaultPolicies
+
+    # --channel-config-policy
+    Endorsement:
+        Type: ImplicitMeta
+        Rule: "ANY Endorsement"
+    Readers:
+        Type: ImplicitMeta
+        Rule: "ANY Readers"
+    Writers:
+        Type: ImplicitMeta
+        Rule: "ANY Writers"
+    Admins:
+        Type: ImplicitMeta
+        Rule: "ANY Admins"
+    LifecycleEndorsement:
+        Type: ImplicitMeta
+        Rule: "ANY Endorsement"
+
+  Organizations:
+
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+#   CHANNEL
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+        Type: ImplicitMeta
+        Rule: "ANY Readers"
+    Writers:
+        Type: ImplicitMeta
+        Rule: "ANY Writers"
+    Admins:
+        Type: ImplicitMeta
+        Rule: "ANY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+ 
+
+Profiles:
+  IntellectualPropertyOrdererGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - <<: *Orderer
+    Consortiums:
+      IntellectualPropertyConsortium:
+        Organizations:
+          - <<: *PrivateIntellectual
+          - <<: *InterIntellectual
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - <<: *Orderer
+  IntellectualPropertyChannel:
+    <<: *ChannelDefaults
+    Consortium: IntellectualPropertyConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - <<: *PrivateIntellectual
+        - <<: *InterIntellectual

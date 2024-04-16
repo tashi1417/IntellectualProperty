@@ -1,0 +1,34 @@
+# Defines four organizations
+# - Orderer organization
+# - Intellectual
+# - Privateintellectual
+# - Interintellectual
+OrdererOrgs:
+  - Name: Orderer
+    Domain: intellectualproperty.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer
+
+PeerOrgs:
+  # Peer configuration for Privateintellectual
+  - Name: PrivateIntellectual
+    Domain: privateintellectual.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: regulatoryauthorities.privateintellectual.com
+        CommonName: regulatoryauthorities.privateintellectual.com
+    Users:
+      Count: 1
+
+  # Peer configuration for Interintellectual
+  - Name: InterIntellectual
+    Domain: interintellectual.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: creators.interintellectual.com
+        CommonName: creators.interintellectual.com
+      - Hostname: publishers.interintellectual.com
+        CommonName: publishers.interintellectual.com
+    Users:
+      Count: 1

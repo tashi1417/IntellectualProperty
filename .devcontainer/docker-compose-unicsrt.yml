@@ -1,0 +1,154 @@
+version: '3.8'
+
+networks:
+  uni-nets:
+
+
+volumes:
+  data-orderer.intellectualproperty.com:
+  data-peer1.intellectualproperty.com:
+  data-peer1.privateintellectual.com:
+  data-creators.interintellectual.com:
+  data-publishers.interintellectual.com:
+  data-regulatoryauthorities.privateintellectual.com:
+
+
+services:
+  development:
+    container_name: devweb2
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # environment:
+    command: sleep infinity
+    stop_grace_period: 5s
+    volumes:
+      - ../..:/workspaces:cached
+    # depends_on:
+    networks:
+      - uni-nets
+
+  orderer.intellectualproperty.com:
+    container_name: orderer.intellectualproperty.com
+    image: hyperledger/fabric-orderer:$IMAGE_TAG
+    command: orderer
+    # Override environment variables for orderer in this section
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - FABRIC_LOGGING_SPEC=ERROR
+    # Host folder mappings
+    volumes:
+      # Folder with genesis block
+      - ${PWD}/config/orderer:/var/hyperledger/config
+      # Map the folder with MSP for orderer
+      - ${PWD}/config/crypto-config/ordererOrganizations/intellectualproperty.com/orderers/orderer.intellectualproperty.com/msp:/var/hyperledger/msp
+      # Added to support the TLS setup
+      - ${PWD}/config/crypto-config/ordererOrganizations/intellectualproperty.com/orderers/orderer.intellectualproperty.com/tls:/var/hyperledger/tls
+      - data-orderer.intellectualproperty.com:/var/ledger
+    ports:
+      - 7050:7050
+      - 8444:8444
+    networks:
+      - uni-nets
+
+ #regulatoryauthorities
+  regulatoryauthorities.privateintellectual.com:
+    container_name: regulatoryauthorities.privateintellectual.com
+    image: hyperledger/fabric-peer:$IMAGE_TAG
+ 
+    # command: peer node start --peer-chaincodedev=true
+    command: peer node start
+    # Environment setup for peer
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - FABRIC_LOGGING_SPEC=WARNING
+      - CORE_PEER_LOCALMSPID=PrivateintellectualMSP
+      - GOPATH=/opt/gopath
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_uni-nets
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=regulatoryauthorities.privateintellectual.com:7051
+    # host file system mappings
+    volumes:
+      # Folder with channel create tx file
+      - ${PWD}/config/regulatoryauthorities:/var/hyperledger/config
+      # Map the folder with MSP for Peer
+      - ${PWD}/config/crypto-config/peerOrganizations/privateintellectual.com/peers/regulatoryauthorities.privateintellectual.com/msp:/var/hyperledger/msp
+      # Added to support the TLS setup
+      - ${PWD}/config/crypto-config/peerOrganizations/privateintellectual.com/peers/regulatoryauthorities.privateintellectual.com/tls:/var/hyperledger/tls
+      - /var/run/:/var/run/
+      - data-regulatoryauthorities.privateintellectual.com:/var/hyperledger/production
+    depends_on: 
+      - orderer.intellectualproperty.com
+    # Map the ports on Host VM to container ports
+    ports:
+      - 9055:7051
+      - 9056:7052
+    networks:
+      - uni-nets
+
+  #creators
+  creators.interintellectual.com:
+    container_name: creators.interintellectual.com
+    image: hyperledger/fabric-peer:$IMAGE_TAG
+  
+    # command: peer node start --peer-chaincodedev=true
+    command: peer node start
+    # Environment setup for peer
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - FABRIC_LOGGING_SPEC=WARNING
+      - CORE_PEER_LOCALMSPID=InterintellectualMSP
+      - GOPATH=/opt/gopath
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_uni-nets
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=creators.interintellectual.com:7051
+    # host file system mappings
+    volumes:
+      # Folder with channel create tx file
+      - ${PWD}/config/creators:/var/hyperledger/config
+      # Map the folder with MSP for Peer
+      - ${PWD}/config/crypto-config/peerOrganizations/interintellectual.com/peers/creators.interintellectual.com/msp:/var/hyperledger/msp
+      # Added to support the TLS setup
+      - ${PWD}/config/crypto-config/peerOrganizations/interintellectual.com/peers/creators.interintellectual.com/tls:/var/hyperledger/tls
+      - /var/run/:/var/run/
+      - data-creators.interintellectual.com:/var/hyperledger/production
+    depends_on: 
+      - orderer.intellectualproperty.com
+    # Map the ports on Host VM to container ports
+    ports:
+      - 10055:7051
+      - 10056:7052
+    networks:
+      - uni-nets
+
+  #publishers
+  publishers.interintellectual.com:
+    container_name: publishers.interintellectual.com
+    image: hyperledger/fabric-peer:$IMAGE_TAG
+  
+    # command: peer node start --peer-chaincodedev=true
+    command: peer node start
+    # Environment setup for peer
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - FABRIC_LOGGING_SPEC=WARNING
+      - CORE_PEER_LOCALMSPID=InterintellectualMSP
+      - GOPATH=/opt/gopath
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_uni-nets
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=publishers.interintellectual.com:7051
+    # host file system mappings
+    volumes:
+      # Folder with channel create tx file
+      - ${PWD}/config/publishers:/var/hyperledger/config
+      # Map the folder with MSP for Peer
+      - ${PWD}/config/crypto-config/peerOrganizations/interintellectual.com/peers/publishers.interintellectual.com/msp:/var/hyperledger/msp
+      # Added to support the TLS setup
+      - ${PWD}/config/crypto-config/peerOrganizations/interintellectual.com/peers/publishers.interintellectual.com/tls:/var/hyperledger/tls
+      - /var/run/:/var/run/
+      - data-publishers.interintellectual.com:/var/hyperledger/production
+    depends_on: 
+      - orderer.intellectualproperty.com
+    # Map the ports on Host VM to container ports
+    ports:
+      - 8055:7051
+      - 8056:7052
+    networks:
+      - uni-nets
