@@ -1,0 +1,48 @@
+{
+	"name": "test-network",
+	"version": "1.0.0",
+	"license": "Apache-2.0",
+	"client": {
+		"tlsEnable": false,
+		"adminCredential": {
+			"id": "admin",
+			"password": "admin"
+		},
+		"enableAuthentication": false,
+		"organization": "PrivateintellectualMSP",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"intellectualpropertychannel": {
+			"peers": {
+				"regulatoryauthorities.privateintellectual.com": {
+				  "url": "grpc://regulatoryauthorities.privateintellectual.com:7051"
+				}
+			  }
+		}
+	},
+	"organizations": {
+		"PrivateintellectualMSP": {
+			"mspid": "PrivateintellectualMSP",
+			"adminPrivateKey": {
+				"path": "/tmp/crypto/peerOrganizations/regulatoryauthorities.privateintellectual.com/users/Admin@privateintellectual.com/msp/keystore/priv_sk"
+			},
+			"peers": ["regulatoryauthorities.privateintellectual.com"],
+			"signedCert": {
+				"path": "/tmp/crypto/peerOrganizations/regulatoryauthorities.privateintellectual.com/users/Admin@privateintellectual.com/msp/signcerts/Admin@privateintellectual.com-cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"regulatoryauthorities.privateintellectual.com": {
+			"url": "grpc://regulatoryauthorities.privateintellectual.com:7051"
+		}
+	}
+}

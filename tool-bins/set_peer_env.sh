@@ -29,11 +29,11 @@ export FABRIC_LOGGING_SPEC=INFO
 echo "FABRIC_LOGGING_SPEC: $FABRIC_LOGGING_SPEC"
 
 # Location of the core.yaml
-export FABRIC_CFG_PATH=/workspaces/intellectualproperty/config/regulatoryauthorities
+export FABRIC_CFG_PATH=/workspaces/intellectualproperty/config/publishers
 echo "FABRIC_CFG_PATH: $FABRIC_CFG_PATH"
 
 # Address of the peer
-export CORE_PEER_ADDRESS=regulatoryauthorities.$1.com:7051
+export CORE_PEER_ADDRESS=publishers.$1.com:7051
 echo "CORE_PEER_ADDRESS: $CORE_PEER_ADDRESS"
 
 # Local MSP for the admin - Commands need to be executed as org admin

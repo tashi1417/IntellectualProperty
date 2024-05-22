@@ -1,0 +1,44 @@
+{
+    "name": "IntellectualPropertyConsortium",
+    "version": "1.0.0",
+    "channels": {
+      "intellectualpropertychannel": {
+        "orderers": ["orderer.intellectualproperty.com"],
+        "peers": {
+          "creators.interintellectual.com": {},
+          "publishers.interintellectual.com": {},
+          "regulatoryauthorities.privateintellectual.com": {}
+        }
+      }
+    },
+    "organizations": {
+      "InterIntellectual": {
+        "mspid": "InterintellectualMSP",
+        "peers": ["creators.interintellectual.com", "publishers.interintellectual.com"]
+      },
+      "Privateintellectual": {
+        "mspid": "PrivateintellectualMSP",
+        "peers": ["regulatoryauthorities.privateintellectual.com"]
+      }
+    },
+    "orderers": {
+      "orderer.intellectualproperty.com": {
+        "url": "grpc://orderer.intellectualproperty.com:7050",
+        "grpcOptions": {
+          "ssl-target-name-override": "orderer.intellectualproperty.com"
+        }
+      }
+    },
+    "peers": {
+      "creators.interintellectual.com": {
+        "url": "grpc://creators.interintellectual.com:7051"
+      },
+      "publishers.interintellectual.com": {
+        "url": "grpc://publishers.interintellectual.com:7051"
+      },
+      "regulatoryauthorities.privateintellectual.com": {
+        "url": "grpc://regulatoryauthorities.privateintellectual.com:7051"
+      }
+    }
+  }
+  
