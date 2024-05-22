@@ -47,22 +47,22 @@ The contract defines a SmartContract struct that provides various functions for 
 # Compiling and Packaging chain codes.
 we are going to compile and package each of the peers that have joined the intellectualproperty channel.  
 
-1.	Set the environment variable.
+1.	Set the environment variable:
    . tool-bins/set_creators_env.sh 
 
-3.	Packaging the chain code
+3.	Packaging the chain code:
    peer lifecycle chaincode package $CC_PACKAGE_FILE -p $CC_PATH --label $CC_LABEL
 
-5.	Install the chain code
+5.	Install the chain code:
    peer lifecycle chaincode install $CC_PACKAGE_FILE
 
-7.	Approve the chaincode
+7.	Approve the chaincode:
    peer lifecycle chaincode approveformyorg -n intellectualmgt -v 1.0 -C intellectualpropertychannel --sequence 1 --package-id $CC_PACKAGE_ID
 
-9.	Commit the chain code
+9.	Commit the chain code:
      peer lifecycle chaincode commit -n intellectualmgt -v 1.0 -C intellectualpropertychannel --sequence 1
 
-11.	Verify the committed chain code
+11.	Verify the committed chain code:
     peer lifecycle chaincode querycommitted -n intellectualmgt -C intellectualpropertychannel
 
 
